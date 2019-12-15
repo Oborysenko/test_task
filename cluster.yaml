@@ -1,0 +1,141 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: geniusee.local
+spec:
+  api:
+    loadBalancer:
+      additionalSecurityGroups:
+      - sg-01aab9714325ee635
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://dev-kops-state-geniusee/geniusee.local
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-us-east-1a
+      name: a
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1c
+      name: c
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-us-east-1a
+      name: a
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1c
+      name: c
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubernetesVersion: 1.11.10
+  masterPublicName: api.geniusee.local
+  networkCIDR: 10.0.0.0/16
+  networkID: vpc-044999dd3f957f2b1
+  networking:
+    canal: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  subnets:
+  - id: subnet-0e8c377e14104f304
+    name: utility-us-east-1a
+    type: Utility
+    zone: us-east-1a
+  - id: subnet-01fe6f37c4f156ec2
+    name: utility-us-east-1b
+    type: Utility
+    zone: us-east-1b
+  - id: subnet-0cc65e182fa635bfd
+    name: utility-us-east-1c
+    type: Utility
+    zone: us-east-1c
+  - egress: nat-0790315cda48135dc
+    id: subnet-0b31635d268d6f5b6
+    name: us-east-1a
+    type: Private
+    zone: us-east-1a
+  - egress: nat-04c6f452205efac16
+    id: subnet-0ffd5a9902030b60d
+    name: us-east-1b
+    type: Private
+    zone: us-east-1b
+  - egress: nat-099e2bb1940a3ca2e
+    id: subnet-0b23e66f6e982532c
+    name: us-east-1c
+    type: Private
+    zone: us-east-1c
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: geniusee.local
+  name: master-us-east-1a
+spec:
+  image: kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2019-09-26
+  kubernetesVersion: 1.11.10
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+  - us-east-1a
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: geniusee.local
+  name: master-us-east-1b
+spec:
+  image: kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2019-09-26
+  kubernetesVersion: 1.11.10
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+  - us-east-1b
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: geniusee.local
+  name: master-us-east-1c
+spec:
+  image: kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2019-09-26
+  kubernetesVersion: 1.11.10
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+  - us-east-1c
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: geniusee.local
+  name: nodes
+spec:
+  image: kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2019-09-26
+  kubernetesVersion: 1.11.10
+  machineType: t2.small
+  maxSize: 2
+  minSize: 2
+  role: Node
+  subnets:
+  - us-east-1a
+  - us-east-1b
+  - us-east-1c
